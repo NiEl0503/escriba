@@ -3,35 +3,36 @@
     <h1>Cadastro de Pessoas</h1>
 
       <input type="text" v-model="filtroTexto" placeholder="Filtrar por nome...">
+      
     
     <button @click="mostrarModalAdicionar">Adicionar Cliente</button>
 
     <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>CPF</th>
-          <th>Data de Nascimento</th>
-          <th>Editar</th>
-          <th>Excluir</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="pessoa in pessoas" :key="pessoa.id">
-          <td>{{ pessoa.id }}</td>
-          <td>{{ pessoa.nome }}</td>
-          <td>{{ pessoa.cpf }}</td>
-          <td>{{ pessoa.dataNascimento }}</td>
-          <td>
-            <button @click="editarPessoa(pessoa)">Editar</button>
-          </td>
-          <td>
-            <button @click="eliminarPessoa(pessoa.id)">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>CPF</th>
+      <th>Data de Nascimento</th>
+      <th>Editar</th>
+      <th>Excluir</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="pessoa in pessoasFiltradas" :key="pessoa.id">
+      <td>{{ pessoa.id }}</td>
+      <td>{{ pessoa.nome }}</td>
+      <td>{{ pessoa.cpf }}</td>
+      <td>{{ pessoa.dataNascimento }}</td>
+      <td>
+        <button @click="editarPessoa(pessoa)">Editar</button>
+      </td>
+      <td>
+        <button @click="eliminarPessoa(pessoa.id)">Excluir</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
     <div v-if="mostrarForm">
       <h2>{{ modoEdicao ? 'Editar Pessoa' : 'Adicionar Pessoa' }}</h2>
@@ -59,6 +60,10 @@
         <label for="cpfModal">CPF:</label>
         <input type="text" id="cpfModal" v-model="novaPessoa.cpf" required>
         <p v-if="errors.cpf">{{ errors.cpf }}</p>
+
+        <label for="dataNascimentoModal">Data de Nascimento:</label>
+        <input type="date" id="dataNascimentoModal" v-model="novaPessoa.dataNascimento" required>
+
         <button type="submit">Adicionar</button>
         <button type="button" @click="fecharModal">Cancelar</button>
       </form>
@@ -88,14 +93,15 @@ export default {
   },
 
  computed: {
-    personasFiltradas() {
-      return this.personas.filter(persona => {
-        const nombreEnMinusculas = persona.nome.toLowerCase();
-        const filtroEnMinusculas = this.filtroTexto.toLowerCase();
-        return nombreEnMinusculas.includes(filtroEnMinusculas);
-      });
-    },
+  pessoasFiltradas() {
+    return this.pessoas.filter(pessoa => {
+      const nomeEmMinusculo = pessoa.nome.toLowerCase();
+      const filtroEmMinusculo = this.filtroTexto.toLowerCase();
+      return nomeEmMinusculo.includes(filtroEmMinusculo);
+    });
   },
+},
+
   methods: {
     obterPessoas() {
       axios.get('http://localhost:3000/pessoas')

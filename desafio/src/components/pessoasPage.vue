@@ -1,6 +1,10 @@
 <template>
-  <div>
+  <section>
     <h1>Cadastro de Pessoas</h1>
+
+      <input type="text" v-model="filtroTexto" placeholder="Filtrar por nome...">
+    
+    <button @click="mostrarModalAdicionar">Adicionar Cliente</button>
 
     <table>
       <thead>
@@ -45,7 +49,22 @@
         <button type="button" @click="cancelarFormulario">Cancelar</button>
       </form>
     </div>
-  </div>
+    <div v-if="mostrarModal">
+      <h2>Adicionar Novo Cliente</h2>
+      <form @submit.prevent="guardarPessoa">
+        <label for="nomeModal">Nome:</label>
+        <input type="text" id="nomeModal" v-model="novaPessoa.nome" required>
+        <p v-if="errors.nome">{{ errors.nome }}</p>
+
+        <label for="cpfModal">CPF:</label>
+        <input type="text" id="cpfModal" v-model="novaPessoa.cpf" required>
+        <p v-if="errors.cpf">{{ errors.cpf }}</p>
+        <button type="submit">Adicionar</button>
+        <button type="button" @click="fecharModal">Cancelar</button>
+      </form>
+    </div>
+
+  </section>
 </template>
 
 <script>
@@ -58,10 +77,24 @@ export default {
       pessoa: { nome: '', cpf: '', dataNascimento: '' },
       mostrarForm: false,
       modoEdicao: false,
+      filtroTexto: '',
+      mostrarModal: false,
+      novaPessoa: { nome: '', cpf: '', dataNascimento: '' },
+      errors: {},
     };
   },
   mounted() {
     this.obterPessoas();
+  },
+
+ computed: {
+    personasFiltradas() {
+      return this.personas.filter(persona => {
+        const nombreEnMinusculas = persona.nome.toLowerCase();
+        const filtroEnMinusculas = this.filtroTexto.toLowerCase();
+        return nombreEnMinusculas.includes(filtroEnMinusculas);
+      });
+    },
   },
   methods: {
     obterPessoas() {
@@ -83,22 +116,30 @@ export default {
       this.modoEdicao = true;
       this.pessoa = { ...pessoa };
     },
-    guardarPessoa() {
-      if (this.modoEdicao) {
-        axios.put(`http://localhost:3000/pessoas/${this.pessoa.id}`, this.pessoa)
-          .then(response => {
-            console.log('Pessoa atualizada:', response.data);
-            this.mostrarForm = false;
-            this.obterPessoas();
-          })
-          .catch(error => {
-            console.error('Erro ao atualizar a pessoa:', error);
-          });
-      } else {
-        axios.post('http://localhost:3000/pessoas', this.pessoa)
+  mostrarModalAdicionar() {
+      this.mostrarModal = true;
+    },
+    fecharModal() {
+      this.mostrarModal = false;
+      this.novaPessoa = { nome: '', cpf: '', dataNascimento: '' };
+      this.errors = {};
+    },
+  guardarPessoa() {
+      this.errors = {};
+      const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+      if (!this.novaPessoa.nome) {
+        this.errors.nome = 'Nome obrigatório.';
+      }
+      if (!cpfRegex.test(this.novaPessoa.cpf)) {
+        this.errors.cpf = 'CPF inválido.';
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        
+        axios.post('http://localhost:3000/pessoas', this.novaPessoa)
           .then(response => {
             console.log('Nova pessoa criada:', response.data);
-            this.mostrarForm = false;
+            this.mostrarModal = false;
             this.obterPessoas();
           })
           .catch(error => {

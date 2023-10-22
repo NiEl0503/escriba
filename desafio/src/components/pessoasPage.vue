@@ -6,7 +6,8 @@
       
     
     <button @click="mostrarModalAdicionar">Adicionar Cliente</button>
-
+<br>
+<br>
     <table>
   <thead>
     <tr>

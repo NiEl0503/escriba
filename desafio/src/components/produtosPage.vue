@@ -1,5 +1,6 @@
 <template>
   <section>
+  <Header />
     <h1>Cadastro de Produtos</h1>
 
     <button @click="mostrarModalAdicionar">Adicionar Produto</button>
@@ -65,8 +66,12 @@
 
 <script>
 import axios from 'axios';
+import Header from './headerComponent';
 
 export default {
+  components: {
+    Header
+  },
   data() {
     return {
       produtos: [],

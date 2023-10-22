@@ -85,6 +85,19 @@
           "subtotal": 26.64
         }
       ]
+    },
+    {
+      "clienteNome": "cliente 2",
+      "dataEmissao": "2018-01-01",
+      "itens": [
+        {
+          "produtoId": 4,
+          "quantidade": 2
+        }
+      ],
+      "produtoSelecionado": 1,
+      "quantidade": 5,
+      "id": 2
     }
   ]
 }

@@ -7,6 +7,7 @@
     <router-link to="/produtosPage">Produtos</router-link><br>
     <router-link to="/pedidosPage">Pedidos</router-link>
   </section>
+      <img src="../assets/picture.png" alt="mulher na mesa" class="woman-image">
 </template>
 
 <script>
@@ -45,6 +46,12 @@ a {
 
   color: $color;
   text-decoration: none;
+}
+
+.woman-image {
+  width: 20%;
+  height: 10%;
+  margin-top: 20px;
 }
 </style>
 

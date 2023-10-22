@@ -1,12 +1,12 @@
 <template>
   <section>
-  <Header />
+    <Header />
     <h1>Cadastro de Pedidos</h1>
 
     <input type="text" v-model="filtroTexto" placeholder="Filtrar por cliente...">
 
-    <button @click="mostrarModalAdicionar">Adicionar Pedido</button>
- <table>
+     <button @click="mostrarModalAdicionar">Adicionar Pedido</button>
+    <table>
       <thead>
         <tr>
           <th>ID</th>
@@ -27,7 +27,7 @@
             <button @click="editarPedido(pedido)">Editar</button>
           </td>
           <td>
-            <button @click="excluirPedido(id)">Excluir</button>
+            <button @click="excluirPedido(pedido.id)">Excluir</button>
           </td>
         </tr>
       </tbody>
@@ -50,10 +50,7 @@
           </select>
 
           <label for="quantidade">Quantidade:</label>
-          <input type="number" v-model="novoPedido.quantidade" required>
-
-          <button type="button" @click="agregarItem()">Agregar Item</button>
-
+          <input type="number" v-model="novoPedido.quantidadeSelecionada" required>
           <button type="submit">{{ modoEdicao ? 'Salvar' : 'Adicionar' }}</button>
           <button type="button" @click="fecharModal">Cancelar</button>
         </form>
@@ -79,11 +76,11 @@ export default {
       mostrarModal: false,
       modoEdicao: false,
       novoPedido: {
-        clienteNome: null,
+        clienteNome: '',
         dataEmissao: '',
         itens: [],
-        productoSelecionado: null,
-      quantidade: 0,
+        produtoSelecionado: null,
+        quantidadeSelecionada: 0,
       },
     };
   },
@@ -102,11 +99,14 @@ export default {
     },
   },
 
-  methods: {
+methods: {
     obterPedidos() {
       axios.get('http://localhost:3000/pedidos')
         .then(response => {
-          this.pedidos = response.data;
+          this.pedidos = response.data.map(pedido => {
+            pedido.valorTotal = pedido.itens.reduce((total, item) => total + item.subtotal, 0);
+            return pedido;
+          });
         })
         .catch(error => {
           console.error(error);
@@ -147,13 +147,23 @@ export default {
       };
     },
 adicionarPedido() {
-  if (this.novoPedido.clienteNome && this.novoPedido.dataEmissao && this.novoPedido.itens.length > 0) {
+  if (this.novoPedido.clienteNome && this.novoPedido.dataEmissao && this.novoPedido.produtoSelecionado && this.novoPedido.quantidadeSelecionada > 0) {
+    const novoItem = {
+      produtoSelecionado: {
+        id: this.novoPedido.produtoSelecionado,
+        descricao: this.produtos.find(produto => produto.id === this.novoPedido.produtoSelecionado).descricao,
+      },
+      valor: this.produtos.find(produto => produto.id === this.novoPedido.produtoSelecionado).valor,
+      quantidade: this.novoPedido.quantidadeSelecionada,
+      subtotal: this.produtos.find(produto => produto.id === this.novoPedido.produtoSelecionado).valor * this.novoPedido.quantidadeSelecionada,
+    };
+
     const novoPedido = {
       cliente: {
         nome: this.novoPedido.clienteNome,
       },
       dataEmissao: this.novoPedido.dataEmissao,
-      itens: this.novoPedido.itens,
+      itens: [novoItem],
     };
 
     axios.post('http://localhost:3000/pedidos', novoPedido)
@@ -169,29 +179,34 @@ adicionarPedido() {
     console.error('Preencha todos os campos antes de adicionar o pedido');
   }
 },
-    agregarItem() {
-      if (this.novoPedido.produtoSelecionado && this.novoPedido.quantidade > 0) {
-        const produtoSelecionado = this.produtos.find(produto => produto.id === this.novoPedido.produtoSelecionado);
-        if (produtoSelecionado) {
-          const novoItem = {
-            produto: {
-              id: produtoSelecionado.id,
-              descricao: produtoSelecionado.descricao,
-            },
-            valor: produtoSelecionado.valor,
-            quantidade: this.novoPedido.quantidade,
-            subtotal: produtoSelecionado.valor * this.novoPedido.quantidade,
-          };
-          this.novoPedido.itens.push(novoItem);
-          this.novoPedido.produtoSelecionado = null;
-          this.novoPedido.quantidade = 0;
-        } else {
-          console.error('Produto não encontrado');
-        }
-      } else {
-        console.error('Selecione um produto e especifique uma quantidade válida.');
-      }
+agregarItem() {
+  if (this.novoPedido.produtoSelecionado && this.novoPedido.quantidadeSelecionada > 0) {
+    const produtoSelecionado = this.produtos.find(produto => produto.id === this.novoPedido.produtoSelecionado);
+    if (produtoSelecionado) {
+      const novoItem = {
+        produtoSelecionado: {
+          id: produtoSelecionado.id,
+          descricao: produtoSelecionado.descricao,
+        },
+        valor: produtoSelecionado.valor,
+        quantidade: this.novoPedido.quantidadeSelecionada,
+        subtotal: produtoSelecionado.valor * this.novoPedido.quantidadeSelecionada,
+      };
+      this.novoPedido.itens.push(novoItem);
+      this.novoPedido.produtoSelecionado = null;
+      this.novoPedido.quantidadeSelecionada = 0;
+      this.calcularValorTotal();
+    } else {
+      console.error('Produto não encontrado');
+    }
+  } else {
+    console.error('Selecione um produto e especifique uma quantidade válida.');
+  }
 },
+calcularValorTotal() {
+  this.novoPedido.valorTotal = this.novoPedido.itens.reduce((total, item) => total + item.subtotal, 0);
+},
+
     editarPedido(pedido) {
       this.novoPedido = { ...pedido };
       this.mostrarModal = true;

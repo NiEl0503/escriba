@@ -87,17 +87,38 @@
       ]
     },
     {
-      "clienteNome": "cliente 2",
-      "dataEmissao": "2018-01-01",
+      "cliente": {
+        "nome": "cliente 2"
+      },
+      "dataEmissao": "2001-01-01",
       "itens": [
         {
-          "produtoId": 4,
-          "quantidade": 2
+          "produtoSelecionado": {
+            "id": 1,
+            "descricao": "produto 1"
+          },
+          "quantidade": 3,
+          "subtotal": null
         }
       ],
-      "produtoSelecionado": 1,
-      "quantidade": 5,
-      "id": 2
+      "id": 3
+    },
+    {
+      "cliente": {
+        "nome": "cliente 3"
+      },
+      "dataEmissao": "2021-01-01",
+      "itens": [
+        {
+          "produtoSelecionado": {
+            "id": 2,
+            "descricao": "produto 2"
+          },
+          "quantidade": 2,
+          "subtotal": null
+        }
+      ],
+      "id": 4
     }
   ]
 }

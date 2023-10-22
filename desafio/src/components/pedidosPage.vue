@@ -1,5 +1,6 @@
 <template>
   <section>
+  <Header />
     <h1>Cadastro de Pedidos</h1>
 
     <input type="text" v-model="filtroTexto" placeholder="Filtrar por cliente...">
@@ -63,7 +64,12 @@
 
 <script>
 import axios from 'axios';
+import Header from './headerComponent';
+
 export default {
+  components: {
+    Header
+  },
   data() {
     return {
       pedidos: [],

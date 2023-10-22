@@ -36,7 +36,7 @@
 
     <div v-if="mostrarForm">
       <h2>{{ modoEdicao ? 'Editar Pessoa' : 'Adicionar Pessoa' }}</h2>
-      <form @submit.prevent="guardarPessoa">
+       <form @submit.prevent="modoEdicao ? guardarClienteEditado() : guardarPessoa()">
         <label for="nome">Nome:</label>
         <input type="text" id="nome" v-model="pessoa.nome" required><br>
 
@@ -120,7 +120,7 @@ export default {
     editarPessoa(pessoa) {
       this.mostrarForm = true;
       this.modoEdicao = true;
-      this.pessoa = { ...pessoa };
+      this.pessoa = { ...pessoa, id: pessoa.id };
     },
   mostrarModalAdicionar() {
       this.mostrarModal = true;
@@ -130,7 +130,7 @@ export default {
       this.novaPessoa = { nome: '', cpf: '', dataNascimento: '' };
       this.errors = {};
     },
-  guardarPessoa() {
+ guardarPessoa() {
       this.errors = {};
       const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
       if (!this.novaPessoa.nome) {
@@ -153,6 +153,34 @@ export default {
           });
       }
     },
+    
+guardarClienteEditado() {
+  this.errors = {};
+  const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+  if (!this.pessoa.nome) {
+    this.errors.nome = 'Nome obrigatório.';
+  }
+  if (!cpfRegex.test(this.pessoa.cpf)) {
+    this.errors.cpf = 'CPF inválido.';
+  }
+
+  if (Object.keys(this.errors).length === 0) {
+    // Usamos el operador de propagación para crear una copia del objeto antes de enviarlo al servidor
+    axios.put(`http://localhost:3000/pessoas/${this.pessoa.id}`, { ...this.pessoa })
+      .then(response => {
+        console.log('Cliente atualizado:', response.data);
+        this.mostrarForm = false;
+        this.obterPessoas();
+      })
+      .catch(error => {
+        console.error('Erro ao atualizar cliente:', error);
+      });
+  }
+},
+
+
+
+
     eliminarPessoa(id) {
       axios.delete(`http://localhost:3000/pessoas/${id}`)
         .then(response => {
@@ -163,6 +191,7 @@ export default {
           console.error('Erro ao eliminar pessoa:', error);
         });
     },
+  
     cancelarFormulario() {
       this.mostrarForm = false;
       this.pessoa = { nome: '', cpf: '', dataNascimento: '' };

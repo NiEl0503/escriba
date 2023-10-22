@@ -17,6 +17,18 @@
       "cpf": "000.000.002-00",
       "dataNascimento": "1999-12-31",
       "id": 3
+    },
+    {
+      "nome": "cliente 4",
+      "cpf": "000.000.003-00",
+      "dataNascimento": "1999-12-31",
+      "id": 4
+    },
+    {
+      "nome": "Rubito Perez",
+      "cpf": "000.000.004-00",
+      "dataNascimento": "1999-12-31",
+      "id": 5
     }
   ],
   "produtos": [

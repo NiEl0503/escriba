@@ -1,5 +1,6 @@
 <template>
   <section>
+  <Header />
     <h1>Cadastro de Pessoas</h1>
 
       <input type="text" v-model="filtroTexto" placeholder="Filtrar por nome...">
@@ -75,8 +76,12 @@
 
 <script>
 import axios from 'axios';
+import Header from './headerComponent';
 
 export default {
+  components: {
+    Header
+  },
   data() {
     return {
       pessoas: [],
@@ -92,7 +97,6 @@ export default {
   mounted() {
     this.obterPessoas();
   },
-
  computed: {
   pessoasFiltradas() {
     return this.pessoas.filter(pessoa => {
@@ -102,7 +106,6 @@ export default {
     });
   },
 },
-
   methods: {
     obterPessoas() {
       axios.get('http://localhost:3000/pessoas')
@@ -113,12 +116,12 @@ export default {
           console.error(error);
         });
     },
-    mostrarFormulario() {
+  mostrarFormulario() {
       this.mostrarForm = true;
       this.modoEdicao = false;
       this.pessoa = { nome: '', cpf: '', dataNascimento: '' };
     },
-    editarPessoa(pessoa) {
+  editarPessoa(pessoa) {
       this.mostrarForm = true;
       this.modoEdicao = true;
       this.pessoa = { ...pessoa, id: pessoa.id };
@@ -126,12 +129,12 @@ export default {
   mostrarModalAdicionar() {
       this.mostrarModal = true;
     },
-    fecharModal() {
+  fecharModal() {
       this.mostrarModal = false;
       this.novaPessoa = { nome: '', cpf: '', dataNascimento: '' };
       this.errors = {};
     },
- guardarPessoa() {
+  guardarPessoa() {
       this.errors = {};
       const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
       if (!this.novaPessoa.nome) {
@@ -155,18 +158,16 @@ export default {
       }
     },
     
-guardarClienteEditado() {
+  guardarClienteEditado() {
   this.errors = {};
   const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-  if (!this.pessoa.nome) {
+    if (!this.pessoa.nome) {
     this.errors.nome = 'Nome obrigatório.';
-  }
-  if (!cpfRegex.test(this.pessoa.cpf)) {
+    }
+    if (!cpfRegex.test(this.pessoa.cpf)) {
     this.errors.cpf = 'CPF inválido.';
-  }
-
-  if (Object.keys(this.errors).length === 0) {
-    // Usamos el operador de propagación para crear una copia del objeto antes de enviarlo al servidor
+    }
+    if (Object.keys(this.errors).length === 0) {
     axios.put(`http://localhost:3000/pessoas/${this.pessoa.id}`, { ...this.pessoa })
       .then(response => {
         console.log('Cliente atualizado:', response.data);
@@ -178,11 +179,7 @@ guardarClienteEditado() {
       });
   }
 },
-
-
-
-
-    eliminarPessoa(id) {
+  eliminarPessoa(id) {
       axios.delete(`http://localhost:3000/pessoas/${id}`)
         .then(response => {
           console.log('Pessoa eliminada:', response.data);
@@ -191,8 +188,7 @@ guardarClienteEditado() {
         .catch(error => {
           console.error('Erro ao eliminar pessoa:', error);
         });
-    },
-  
+    },  
     cancelarFormulario() {
       this.mostrarForm = false;
       this.pessoa = { nome: '', cpf: '', dataNascimento: '' };

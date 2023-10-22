@@ -1,4 +1,5 @@
 <template>
+ <Header />
   <section class="welcome">
     <h1>Bem vindo(a)</h1>
     <p>Selecione uma seção para começar:</p>
@@ -7,6 +8,15 @@
     <router-link to="/pedidosPage">Pedidos</router-link>
   </section>
 </template>
+
+<script>
+import Header from './headerComponent';
+export default {
+  components: {
+    Header
+  },
+}
+</script>
 
 <style lang="scss">
 $backgroundColor: #0f7;

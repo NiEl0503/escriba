@@ -18,6 +18,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+.header {
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px 0;
+  background-color: #0f7;
+}
+
+.logo img {
+  width: 150px;
+  height: auto;
+}
 .return-button {
   text-decoration: none;
   color: white;
